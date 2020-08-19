@@ -5,6 +5,11 @@ import UserType from "../modules/User/UserType";
 import UserConnection from "../modules/User/UserConnection";
 import * as UserLoader from "../modules/User/UserLoader";
 
+import RoomType from "../modules/Room/RoomType";
+import RoomModel from "../modules/Room/RoomModel";
+import RoomConnection from "../modules/Room/RoomConnection";
+import * as RoomLoader from "../modules/Room/RoomLoader";
+
 import { NodeField } from "../interface/NodeInterface";
 
 const QueryType = new GraphQLObjectType({
@@ -39,6 +44,30 @@ const QueryType = new GraphQLObjectType({
       },
       resolve: async (_, args, context) =>
         await UserLoader.loadUsers(context, args),
+    },
+    getRoom: {
+      type: RoomType,
+      args: {
+        guid: {
+          type: GraphQLNonNull(GraphQLString),
+        },
+      },
+      resolve: async (_, { guid }, context) => {
+        const room = await RoomModel.findOne({ guid });
+        if (!room) return "Room not found";
+        return room;
+      },
+    },
+    getUserRooms: {
+      type: RoomType,
+      args: {
+        username: {
+          type: GraphQLNonNull(GraphQLString),
+        },
+      },
+      resolve: async (_, { username }, context) => {
+        return null;
+      },
     },
   }),
 });

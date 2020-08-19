@@ -38,6 +38,7 @@ export default mutationWithClientMutationId({
 
     return {
       token: generateToken(user),
+      error: null,
     };
   },
   outputFields: {
