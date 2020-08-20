@@ -1,8 +1,8 @@
 {
-  "name": "trauria-graphql",
+  "name": "tauria-graphql",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/leonardomso/trauria-graphql.git",
+  "repository": "https://github.com/leonardomso/tauria-graphql.git",
   "author": "leonardomso <leonardomso11@gmail.com>",
   "license": "MIT",
   "scripts": {
