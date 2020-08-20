@@ -15,8 +15,7 @@ export default mutationWithClientMutationId({
   mutateAndGetPayload: async ({ guid }, { user }: GraphQLContext) => {
     if (!user) {
       return {
-        message: null,
-        error: "You must be logged in to leave a room",
+        error: "You must be logged in to join a room",
       };
     }
 
@@ -29,10 +28,18 @@ export default mutationWithClientMutationId({
         message: null,
         error: "Room does not exist",
       };
-    }
-
-    if (room.participants.length === 0 && userIsHostOfTheRoom) {
+    } else if (!room.participants.length && userIsHostOfTheRoom) {
       await room.remove();
+
+      return {
+        message: "You leave the room successfully!",
+        error: null,
+      };
+    } else if (room.participants.length && userIsHostOfTheRoom) {
+      room.host_user = room.participants[0];
+      room.participants.splice(0, 1);
+
+      await room.save();
 
       return {
         message: "You leave the room successfully!",
