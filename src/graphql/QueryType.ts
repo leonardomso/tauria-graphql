@@ -1,4 +1,9 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull } from "graphql";
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
+} from "graphql";
 import { fromGlobalId, connectionArgs } from "graphql-relay";
 
 import UserType from "../modules/User/UserType";
@@ -11,6 +16,7 @@ import RoomConnection from "../modules/Room/RoomConnection";
 import * as RoomLoader from "../modules/Room/RoomLoader";
 
 import { NodeField } from "../interface/NodeInterface";
+import UserModel from "../modules/User/UserModel";
 
 const QueryType = new GraphQLObjectType({
   name: "Query",
@@ -69,14 +75,14 @@ const QueryType = new GraphQLObjectType({
         await RoomLoader.loadRooms(context, args),
     },
     getUserRooms: {
-      type: RoomType,
+      type: GraphQLList(RoomType),
       args: {
         username: {
           type: GraphQLNonNull(GraphQLString),
         },
       },
       resolve: async (_, { username }, context) => {
-        return null;
+        const user = await UserModel.findOne({ username });
       },
     },
   }),

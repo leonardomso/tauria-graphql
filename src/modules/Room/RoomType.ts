@@ -8,7 +8,6 @@ import {
 import { globalIdField } from "graphql-relay";
 
 import UserType from "../User/UserType";
-
 import UserModel from "../User/UserModel";
 
 const RoomType: GraphQLObjectType = new GraphQLObjectType({
