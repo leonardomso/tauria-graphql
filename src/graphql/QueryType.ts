@@ -82,7 +82,33 @@ const QueryType = new GraphQLObjectType({
         },
       },
       resolve: async (_, { username }, context) => {
+        const rooms = await RoomModel.find();
         const user = await UserModel.findOne({ username });
+
+        if (!user) {
+          return "Username does not exist";
+        } else {
+          const userId = String(user._id);
+
+          let results = [];
+
+          const userHostRooms = await rooms.filter(
+            ({ host_user }) => String(host_user) === userId,
+          );
+
+          await rooms.map((room) => {
+            room.participants.map((participant) => {
+              if (String(participant) === userId) {
+                results.push(room);
+              }
+            });
+          });
+
+          results = [...results, ...userHostRooms];
+          const newResults = [...new Set(results)];
+
+          return newResults;
+        }
       },
     },
   }),
