@@ -42,7 +42,7 @@ export default mutationWithClientMutationId({
       guid,
       participants,
       capacity,
-      host_user: user.id,
+      host_user: user._id,
     });
 
     await room.save();

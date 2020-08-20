@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLNonNull, GraphQLID } from "graphql";
+import { GraphQLString, GraphQLNonNull } from "graphql";
 import { mutationWithClientMutationId } from "graphql-relay";
 
 import { GraphQLContext } from "../../../types";
@@ -6,22 +6,16 @@ import { GraphQLContext } from "../../../types";
 import RoomModel from "../RoomModel";
 
 export default mutationWithClientMutationId({
-  name: "RoomChangeHost",
+  name: "RoomJoinRoom",
   inputFields: {
     guid: {
       type: GraphQLNonNull(GraphQLString),
     },
-    new_host_user: {
-      type: GraphQLNonNull(GraphQLString),
-    },
   },
-  mutateAndGetPayload: async (
-    { guid, new_host_user },
-    { user }: GraphQLContext,
-  ) => {
+  mutateAndGetPayload: async ({ guid }, { user }: GraphQLContext) => {
     if (!user) {
       return {
-        error: "You must be logged in to change the host of a room",
+        error: "You must be logged in to join a room",
       };
     }
 
@@ -32,17 +26,18 @@ export default mutationWithClientMutationId({
         message: null,
         error: "Room does not exist",
       };
-    } else if (String(user._id) !== String(room.host_user)) {
+    } else if (String(room.host_user) === String(user._id)) {
       return {
         message: null,
-        error: "You must be the current host of the room to change the host",
+        error: "You cannot join a room when you are the current host",
       };
     } else {
-      room.host_user = new_host_user;
+      await room.participants.push(user._id);
+
       await room.save();
 
       return {
-        message: "Room host updated successfully",
+        message: "Joined room successfully!",
         error: null,
       };
     }

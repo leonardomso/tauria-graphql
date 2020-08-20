@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLNonNull, GraphQLID } from "graphql";
+import { GraphQLString, GraphQLNonNull } from "graphql";
 import { mutationWithClientMutationId } from "graphql-relay";
 
 import { GraphQLContext } from "../../../types";
@@ -6,43 +6,36 @@ import { GraphQLContext } from "../../../types";
 import RoomModel from "../RoomModel";
 
 export default mutationWithClientMutationId({
-  name: "RoomChangeHost",
+  name: "RoomLeaveRoom",
   inputFields: {
     guid: {
       type: GraphQLNonNull(GraphQLString),
     },
-    new_host_user: {
-      type: GraphQLNonNull(GraphQLString),
-    },
   },
-  mutateAndGetPayload: async (
-    { guid, new_host_user },
-    { user }: GraphQLContext,
-  ) => {
+  mutateAndGetPayload: async ({ guid }, { user }: GraphQLContext) => {
     if (!user) {
       return {
-        error: "You must be logged in to change the host of a room",
+        message: null,
+        error: "You must be logged in to leave a room",
       };
     }
 
     const room = await RoomModel.findOne({ guid });
+
+    const userIsHostOfTheRoom = String(room.host_user) === String(user._id);
 
     if (!room) {
       return {
         message: null,
         error: "Room does not exist",
       };
-    } else if (String(user._id) !== String(room.host_user)) {
-      return {
-        message: null,
-        error: "You must be the current host of the room to change the host",
-      };
-    } else {
-      room.host_user = new_host_user;
-      await room.save();
+    }
+
+    if (room.participants.length === 0 && userIsHostOfTheRoom) {
+      await room.remove();
 
       return {
-        message: "Room host updated successfully",
+        message: "You leave the room successfully!",
         error: null,
       };
     }

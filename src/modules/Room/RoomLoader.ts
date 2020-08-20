@@ -6,7 +6,7 @@ import DataLoader from "dataloader";
 import { ConnectionArguments } from "graphql-relay";
 import { Schema } from "mongoose";
 
-import RoomModel, { IRoom } from "../Room/RoomModel";
+import RoomModel, { IRoom } from "../../modules/Room/RoomModel";
 import { GraphQLContext } from "../../types";
 import { DataLoaderKey } from "../../loaders";
 
@@ -20,7 +20,7 @@ export default class Room {
   name: string;
   guid: string;
   host_user: User;
-  participants: Array<string>;
+  participants: Array<User>;
   capacity: number;
 
   constructor(data: IRoom) {

@@ -9,7 +9,6 @@ const RoomSchema = new Schema(
       trim: true,
       index: true,
       required: true,
-      lowercase: true,
     },
     guid: {
       type: String,
@@ -22,7 +21,8 @@ const RoomSchema = new Schema(
     },
     participants: [
       {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "User",
       },
     ],
     capacity: {
@@ -40,7 +40,7 @@ export interface IRoom extends Document {
   name: string;
   guid: string;
   host_user: User;
-  participants: Array<string>;
+  participants: Array<User>;
   capacity: number;
 }
 

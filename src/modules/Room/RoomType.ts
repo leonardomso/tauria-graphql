@@ -4,11 +4,12 @@ import {
   GraphQLNonNull,
   GraphQLInt,
   GraphQLList,
-  GraphQLID,
 } from "graphql";
 import { globalIdField } from "graphql-relay";
 
 import UserType from "../User/UserType";
+
+import UserModel from "../User/UserModel";
 
 const RoomType: GraphQLObjectType = new GraphQLObjectType({
   name: "Room",
@@ -29,11 +30,16 @@ const RoomType: GraphQLObjectType = new GraphQLObjectType({
     },
     host_user: {
       type: GraphQLNonNull(UserType),
-      resolve: ({ host_user }) => host_user,
+      resolve: async (room, args, context) => {
+        const user = await UserModel.findOne({ _id: room.host_user });
+        return user;
+      },
     },
     participants: {
-      type: GraphQLList(GraphQLID),
-      resolve: ({ participants }) => participants,
+      type: GraphQLList(UserType),
+      resolve: async (room, args, context) => {
+        return await room.participants.map((_id) => UserModel.findOne({ _id }));
+      },
     },
     capacity: {
       type: GraphQLNonNull(GraphQLInt),

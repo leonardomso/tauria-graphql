@@ -53,10 +53,20 @@ const QueryType = new GraphQLObjectType({
         },
       },
       resolve: async (_, { guid }, context) => {
-        const room = await RoomModel.findOne({ guid });
-        if (!room) return "Room not found";
+        const room = RoomModel.findOne({ guid });
         return room;
       },
+    },
+    getRooms: {
+      type: RoomConnection.connectionType,
+      args: {
+        ...connectionArgs,
+        search: {
+          type: GraphQLString,
+        },
+      },
+      resolve: async (_, args, context) =>
+        await RoomLoader.loadRooms(context, args),
     },
     getUserRooms: {
       type: RoomType,
